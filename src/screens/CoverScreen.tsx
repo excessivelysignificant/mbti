@@ -7,46 +7,62 @@ type Props = {
 
 export function CoverScreen({ onStart }: Props) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
+    <div className="min-h-screen flex flex-col items-center justify-center px-5 py-10">
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
         className="max-w-md w-full"
       >
-        <div className="text-center mb-10">
-          <div className="text-6xl mb-5 select-none animate-float">🌈</div>
-          <div className="text-white/70 tracking-[0.4em] text-xs mb-2">16 PERSONALITIES</div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 leading-tight">
-            看见真实的你
+        {/* 标题块 */}
+        <div className="text-center mb-8 relative">
+          <span className="tape inline-block mb-5 text-sm">
+            16 PERSONALITIES TEST
+          </span>
+          <h1 className="text-[2.6rem] sm:text-5xl font-black leading-[1.05] mb-3 text-[var(--ink)]">
+            <span className="underline-mark">看见</span>
+            <br />
+            <span className="relative inline-block">
+              真实的你
+              <SparkleSvg className="absolute -top-3 -right-7 w-7 h-7 animate-wiggle" />
+            </span>
           </h1>
-          <p className="text-white/75">从一道题开始,认识你自己</p>
+          <p className="text-[var(--ink)]/70 mt-2 text-base">
+            从一道题开始 · 给自己一面镜子
+          </p>
         </div>
 
+        {/* 模式选项 */}
         <div className="space-y-4">
           <ModeCard
             mode="simple"
             emoji="⚡"
             title="简单版"
             meta="16 题 · 约 2 分钟"
-            desc="快速了解你的大致人格类型,适合刚接触 MBTI"
+            desc="先尝个鲜,够看个大概"
+            badge="新手友好"
+            color="var(--acid-yellow)"
+            rotate={-1.2}
             onClick={() => onStart('simple')}
-            badge="推荐新手"
           />
           <ModeCard
             mode="accurate"
             emoji="🎯"
             title="准确版"
             meta="28 题 · 约 4 分钟"
-            desc="更细致的多维度刻画,结果更稳定可靠"
+            desc="想被精准戳中?选这个"
+            badge="更准"
+            color="var(--mint)"
+            rotate={1.2}
             onClick={() => onStart('accurate')}
-            badge="更精准"
           />
         </div>
 
-        <p className="text-white/45 text-xs text-center mt-8">
-          即测即出 · 无需注册 · 可生成分享卡片
-        </p>
+        <div className="text-center mt-8">
+          <span className="sticker-pop text-xs text-[var(--ink)]/80">
+            ✨ 即测即出 · 无需注册 · 可生成分享图
+          </span>
+        </div>
       </motion.div>
     </div>
   )
@@ -59,6 +75,8 @@ function ModeCard({
   desc,
   onClick,
   badge,
+  color,
+  rotate,
 }: {
   mode: QuizMode
   emoji: string
@@ -67,33 +85,46 @@ function ModeCard({
   desc: string
   onClick: () => void
   badge?: string
+  color: string
+  rotate: number
 }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+      whileHover={{ scale: 1.02, rotate: rotate * 0.3 }}
+      whileTap={{ scale: 0.97, rotate: 0 }}
+      transition={{ type: 'spring', stiffness: 280, damping: 22 }}
       onClick={onClick}
-      className="glass-strong w-full rounded-3xl p-5 text-left flex items-center gap-4 group"
+      className="sticker w-full p-5 text-left flex items-center gap-4 group"
+      style={{ background: color, transform: `rotate(${rotate}deg)` }}
     >
-      <div className="text-4xl shrink-0 group-hover:scale-110 transition-transform">
+      <div
+        className="w-16 h-16 sticker-soft flex items-center justify-center text-3xl shrink-0 bg-white"
+      >
         {emoji}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-white text-xl font-semibold">{title}</span>
+          <span className="text-2xl font-black text-[var(--ink)]">{title}</span>
           {badge && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white/90 tracking-wide">
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-[var(--ink)] text-white font-bold tracking-wide">
               {badge}
             </span>
           )}
         </div>
-        <div className="text-white/60 text-xs mb-1.5">{meta}</div>
-        <div className="text-white/80 text-sm leading-snug">{desc}</div>
+        <div className="text-[var(--ink)]/65 text-xs mb-1.5 font-medium">{meta}</div>
+        <div className="text-[var(--ink)]/85 text-sm leading-snug">{desc}</div>
       </div>
-      <div className="text-white/50 text-2xl shrink-0 group-hover:translate-x-1 transition-transform">
+      <div className="text-[var(--ink)] text-3xl shrink-0 font-black group-hover:translate-x-1 transition-transform">
         →
       </div>
     </motion.button>
+  )
+}
+
+function SparkleSvg({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="#ff3da3" stroke="#0f0a1f" strokeWidth="2">
+      <path d="M12 2 C13 8 16 11 22 12 C16 13 13 16 12 22 C11 16 8 13 2 12 C8 11 11 8 12 2 Z" strokeLinejoin="round" />
+    </svg>
   )
 }

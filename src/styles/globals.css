@@ -3,7 +3,17 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  /* Y2K palette */
+  --ink: #0f0a1f;
+  --paper: #fffaf2;
+  --hot-pink: #ff3da3;
+  --acid-yellow: #fff45e;
+  --baby-blue: #93e6ff;
+  --mint: #aef7c4;
+  --lilac: #d6b3ff;
+  --tomato: #ff6a4d;
+
+  color-scheme: light;
 }
 
 html,
@@ -20,59 +30,135 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
-  background: #0f0a1f;
-  color: #fff;
+  background: var(--paper);
+  color: var(--ink);
 }
 
 button {
   -webkit-tap-highlight-color: transparent;
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+/* ─────────  Y2K 贴纸 / 卡片 / 标签  ───────── */
+
+.sticker {
+  border: 3px solid var(--ink);
+  border-radius: 28px;
+  box-shadow: 6px 6px 0 var(--ink);
+  background: #fff;
+  position: relative;
 }
 
-.glass-strong {
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+.sticker-soft {
+  border: 2.5px solid var(--ink);
+  border-radius: 24px;
+  box-shadow: 4px 4px 0 var(--ink);
+  background: #fff;
 }
 
-@keyframes blob {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(40px, -60px) scale(1.1);
-  }
-  66% {
-    transform: translate(-30px, 30px) scale(0.92);
-  }
+.sticker-pop {
+  border: 3px solid var(--ink);
+  border-radius: 100px;
+  box-shadow: 4px 4px 0 var(--ink);
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
 }
 
-.animate-blob {
-  animation: blob 18s ease-in-out infinite;
+.tape {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--acid-yellow);
+  border: 2px solid var(--ink);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transform: rotate(-2deg);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+/* 网格背景 */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--ink) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ink) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+  opacity: 0.06;
+}
+
+/* 圆点背景 */
+.bg-dots {
+  background-image: radial-gradient(var(--ink) 1.4px, transparent 1.6px);
+  background-size: 18px 18px;
+  opacity: 0.08;
+}
+
+/* ─────────  动效  ───────── */
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 1.6s ease-in-out infinite;
 }
 
 @keyframes float-slow {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-6px); }
 }
 
 .animate-float {
-  animation: float-slow 4s ease-in-out infinite;
+  animation: float-slow 3.6s ease-in-out infinite;
 }
 
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.6) rotate(-12deg); opacity: 0; }
+  60% { transform: scale(1.06) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.animate-pop {
+  animation: pop-in 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.4);
+}
+
+@keyframes shimmer {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(20deg); }
+}
+
+.animate-shimmer {
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+/* 滚动条隐藏 */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   scrollbar-width: none;
+}
+
+/* 下划亮线 (笔触感) */
+.underline-mark {
+  background-image: linear-gradient(transparent 60%, var(--acid-yellow) 60%);
+  padding: 0 2px;
+}
+
+/* SVG icon 默认 stroke */
+.ink-stroke path,
+.ink-stroke circle,
+.ink-stroke rect,
+.ink-stroke line {
+  stroke: var(--ink);
 }

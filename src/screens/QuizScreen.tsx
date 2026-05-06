@@ -10,12 +10,16 @@ type Props = {
   onBack: () => void
 }
 
+const OPTION_COLORS = ['#fff45e', '#93e6ff'] as const
+const OPTION_TILT = [-1.4, 1.4] as const
+
 export function QuizScreen({ mode, onFinish, onBack }: Props) {
   const questions = useMemo(() => getQuestions(mode), [mode])
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Answers>({})
   const [direction, setDirection] = useState(1)
   const [picked, setPicked] = useState<number | null>(null)
+  const [banter, setBanter] = useState<string | null>(null)
 
   const q = questions[step]
 
@@ -25,18 +29,25 @@ export function QuizScreen({ mode, onFinish, onBack }: Props) {
     const next = { ...answers, [q.id]: idx }
     setAnswers(next)
 
+    const banterText = q.options[idx].banter
+    if (banterText) setBanter(banterText)
+
+    const delay = banterText ? 900 : 280
+
     setTimeout(() => {
       setPicked(null)
+      setBanter(null)
       if (step === questions.length - 1) {
         onFinish(next)
       } else {
         setDirection(1)
         setStep((s) => s + 1)
       }
-    }, 260)
+    }, delay)
   }
 
   const back = () => {
+    if (picked !== null) return
     if (step === 0) {
       onBack()
       return
@@ -47,10 +58,11 @@ export function QuizScreen({ mode, onFinish, onBack }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col px-5 py-6 sm:py-8">
-      <div className="flex items-center gap-3 mb-6 max-w-md w-full mx-auto">
+      {/* 顶部进度 */}
+      <div className="flex items-center gap-3 mb-7 max-w-md w-full mx-auto">
         <button
           onClick={back}
-          className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white text-lg flex items-center justify-center transition"
+          className="w-10 h-10 sticker-soft text-[var(--ink)] text-lg font-black flex items-center justify-center shrink-0 bg-white"
           aria-label={step === 0 ? '返回' : '上一题'}
         >
           ←
@@ -60,6 +72,7 @@ export function QuizScreen({ mode, onFinish, onBack }: Props) {
         </div>
       </div>
 
+      {/* 主内容 */}
       <div className="flex-1 flex items-center justify-center">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
@@ -71,50 +84,69 @@ export function QuizScreen({ mode, onFinish, onBack }: Props) {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="w-full max-w-md"
           >
-            <div className="glass-strong rounded-3xl px-6 py-7 mb-6">
-              <div className="flex items-center gap-2 text-white/55 text-xs mb-3 tracking-widest">
-                <span>Q{q.id}</span>
-                <span className="opacity-60">·</span>
-                <span>{dimLabel(q.dim)}</span>
+            {/* 题目卡 */}
+            <div
+              className="sticker px-6 py-7 mb-8 relative"
+              style={{ background: 'white', transform: 'rotate(-0.6deg)' }}
+            >
+              <div className="absolute -top-3 left-5 tape text-xs">
+                Q{q.id} · {dimLabel(q.dim)}
               </div>
-              <h2 className="text-white text-xl sm:text-[1.4rem] font-semibold leading-relaxed">
+              <h2 className="text-[var(--ink)] text-xl sm:text-[1.4rem] font-bold leading-relaxed mt-1">
                 {q.text}
               </h2>
             </div>
 
-            <div className="flex flex-col gap-3">
+            {/* 选项 */}
+            <div className="flex flex-col gap-4 relative">
               {q.options.map((opt, i) => {
                 const active = picked === i
                 return (
                   <motion.button
                     key={i}
-                    whileTap={{ scale: 0.97 }}
-                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.96 }}
+                    whileHover={{ scale: 1.025, rotate: OPTION_TILT[i] * 0.4 }}
                     onClick={() => choose(i as 0 | 1)}
-                    className={`relative w-full px-5 py-5 rounded-2xl text-white text-base sm:text-[1.05rem] font-medium text-left transition border backdrop-blur-md
-                      ${active
-                        ? 'bg-white/30 border-white/60 shadow-2xl'
-                        : 'bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/40'
-                      }
-                    `}
+                    className={`sticker w-full px-5 py-5 text-[var(--ink)] text-base sm:text-lg font-bold text-left flex items-center gap-3 transition-transform`}
+                    style={{
+                      background: active ? OPTION_COLORS[i] : 'white',
+                      transform: `rotate(${OPTION_TILT[i]}deg)`,
+                    }}
                   >
                     <span
-                      className={`inline-flex items-center justify-center w-7 h-7 rounded-full mr-3 text-xs font-bold transition
-                        ${active ? 'bg-white text-purple-700' : 'bg-white/20 text-white/80'}`}
+                      className="inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-black shrink-0 border-2 border-[var(--ink)]"
+                      style={{
+                        background: OPTION_COLORS[i],
+                      }}
                     >
                       {i === 0 ? 'A' : 'B'}
                     </span>
-                    {opt.label}
+                    <span className="flex-1">{opt.label}</span>
                   </motion.button>
                 )
               })}
+
+              {/* 选完吐槽气泡 */}
+              <AnimatePresence>
+                {banter && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.4, y: 18, rotate: -6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0, rotate: -3 }}
+                    exit={{ opacity: 0, scale: 0.5, y: -10 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                    className="absolute left-1/2 -translate-x-1/2 -top-12 sticker-pop bg-[var(--hot-pink)] text-white text-sm font-bold pointer-events-none"
+                  >
+                    💬 {banter}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="text-center text-white/45 text-xs mt-6">
-        没有标准答案,选最贴近自己直觉的那个
+      <div className="text-center text-[var(--ink)]/55 text-xs mt-7 font-medium">
+        没有标准答案,选最像你的那个就好 ✨
       </div>
     </div>
   )

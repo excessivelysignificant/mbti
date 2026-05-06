@@ -33,7 +33,7 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen">
-      <GradientBackground gradient={result?.personality.gradient} />
+      <GradientBackground accent={result?.personality.gradient} />
       {stage === 'cover' && <CoverScreen onStart={start} />}
       {stage === 'quiz' && (
         <QuizScreen mode={mode} onFinish={finish} onBack={backFromQuiz} />
